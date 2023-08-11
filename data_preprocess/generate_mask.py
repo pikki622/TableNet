@@ -12,13 +12,14 @@ def sameTable(ymin_1, ymin_2, ymax_1, ymax_2):
     min_diff = abs(ymin_1 - ymin_2)
     max_diff = abs(ymax_1 - ymax_2)
 
-    if min_diff <= 5 and max_diff <=5:
-        return True
-    elif min_diff <= 4 and max_diff <=7:
-        return True
-    elif min_diff <= 7 and max_diff <=4:
-        return True
-    return False
+    return (
+        min_diff <= 5
+        and max_diff <= 5
+        or min_diff <= 4
+        and max_diff <= 7
+        or min_diff <= 7
+        and max_diff <= 4
+    )
 
 
 if __name__ == "__main__":
@@ -33,7 +34,7 @@ if __name__ == "__main__":
             filename = filename[:-4]
 
             # Parse xml file
-            tree = ET.parse('./dataset/Marmot/' + filename + '.xml')
+            tree = ET.parse(f'./dataset/Marmot/{filename}.xml')
             root = tree.getroot()
             size = root.find('size')
 
@@ -61,29 +62,29 @@ if __name__ == "__main__":
                 ymax = int(bndbox.find('ymax').text)
 
                 col_mask[ymin:ymax, xmin:xmax] = 255
-                                
+
                 if got_first_column:
                     if sameTable(prev_ymin, ymin, prev_ymax, ymax) == False:
                         i+=1
                         got_first_column = False
                         table_mask[table_ymin:table_ymax, table_xmin:table_xmax] = 255
-                        
+
                         table_xmin = 10000
                         table_xmax = 0
 
                         table_ymin = 10000
                         table_ymax = 0
-                        
+
                 if got_first_column == False:
                     got_first_column = True
                     first_xmin = xmin
-                    
+
                 prev_ymin = ymin
                 prev_ymax = ymax
-                
+
                 table_xmin = min(xmin, table_xmin)
                 table_xmax = max(xmax, table_xmax)
-                
+
                 table_ymin = min(ymin, table_ymin)
                 table_ymax = max(ymax, table_ymax)
 
